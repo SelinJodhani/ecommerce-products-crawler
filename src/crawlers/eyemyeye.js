@@ -60,5 +60,5 @@ export default async function (searchQuery, context) {
     console.error(err);
   }
 
-  return { products, website: 'eyemyeye.com' };
+  return { products, website: 'eyemyeye' };
 }

@@ -10,13 +10,18 @@ export default async function (searchQuery, context) {
 
     while (true) {
       await page.waitForSelector(
-        '[class="sg-col sg-col-4-of-12 sg-col-8-of-16 sg-col-12-of-20 sg-col-12-of-24 s-list-col-right"]',
-        { timeout: 5000 }
+        '.s-pagination-item.s-pagination-next.s-pagination-button.s-pagination-separator'
       );
 
-      const productContainer = await page.$$(
+      let productContainer = await page.$$(
         '[class="sg-col sg-col-4-of-12 sg-col-8-of-16 sg-col-12-of-20 sg-col-12-of-24 s-list-col-right"]'
       );
+
+      if (productContainer.length === 0) {
+        productContainer = await page.$$(
+          'div[class="sg-col-4-of-24 sg-col-4-of-12 s-result-item s-asin sg-col-4-of-16 sg-col s-widget-spacing-small sg-col-4-of-20"]'
+        );
+      }
 
       for (let product of productContainer) {
         const containerHtml = await product.innerHTML();
@@ -37,27 +42,36 @@ export default async function (searchQuery, context) {
         const productTitle = $(
           'a[class="a-link-normal s-underline-text s-underline-link-text s-link-style a-text-normal"]'
         ).text();
-        const productRatingCount = $('span[class="a-icon-alt"]').text();
-        const productReviewCount = $('span[class="a-size-base s-underline-text"]').text();
-        const productPrice = $('span[class="a-offscreen"]').text().split('₹')[1];
+        const productRatingCount = +$('span[class="a-icon-alt"]').text().split(' ')[0];
+        const productReviewCount = +$('span[class="a-size-base s-underline-text"]')
+          .text()
+          .split(',')
+          .join('');
+        let productPrice = typeof $('span[class="a-offscreen"]').text().split('₹')[1];
+        if (productPrice === 'string') {
+          productPrice = +$('span[class="a-offscreen"]').text().split('₹')[1].split(',').join('');
+        } else {
+          productPrice = +$('span[class="a-offscreen"]').text().split('₹')[1];
+        }
 
         products.push({
           url: `www.amazon.in/${first}/${second}/${third}`,
           title: productTitle,
-          code: productTitle.toLowerCase().split(' ').join('_'),
           reviewCount: productReviewCount,
           rating: productRatingCount,
           price: productPrice,
+          website: 'www.amazon.in',
         });
       }
 
-      const nextButton = await page.$('a:has-text("Next")');
-
-      if (!nextButton) {
-        break;
-      }
-
-      await nextButton.click();
+      await Promise.all([
+        await page.waitForSelector(
+          '.s-pagination-item.s-pagination-next.s-pagination-button.s-pagination-separator'
+        ),
+        await page.click(
+          '.s-pagination-item.s-pagination-next.s-pagination-button.s-pagination-separator'
+        ),
+      ]);
 
       console.log(
         `-> ${products.length} products scraped for category ${searchQuery} from amazon.in`
@@ -67,5 +81,5 @@ export default async function (searchQuery, context) {
     console.error(err);
   }
 
-  return { products, website: 'amazon.in' };
+  return { products, website: 'amazon' };
 }

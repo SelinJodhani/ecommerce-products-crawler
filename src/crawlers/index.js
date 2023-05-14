@@ -24,7 +24,7 @@ export default async function (searchQuery) {
       products.map(async product => {
         if (product.status === 'fulfilled') {
           const { value } = product;
-          console.log(value);
+          console.log(value.products.length, ' : ', value.website);
           return Product.insertMany(value.products, { ordered: false });
         }
       })
