@@ -16,9 +16,11 @@ const productSchema = new mongoose.Schema(
     },
     total_review_count: {
       type: Number,
+      default: 0,
     },
     rating: {
       type: Number,
+      default: 0,
     },
     price: {
       type: Number,

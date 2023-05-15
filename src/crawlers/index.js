@@ -13,11 +13,11 @@ export default async function (searchQuery) {
 
   try {
     const products = await Promise.allSettled([
-      scrapeAmazon(searchQuery, context),
+      // scrapeAmazon(searchQuery, context),
       scrapeFlipkart(searchQuery, context),
-      scrapeMeesho(searchQuery, context),
-      scrapeEyeMyEye(searchQuery, context),
-      scrape1mg(searchQuery, context),
+      // scrapeMeesho(searchQuery, context),
+      // scrapeEyeMyEye(searchQuery, context),
+      // scrape1mg(searchQuery, context),
     ]);
 
     await Promise.allSettled(
@@ -32,6 +32,6 @@ export default async function (searchQuery) {
   } catch (err) {
     console.error(err);
   } finally {
-    await browser.close();
+    // await browser.close();
   }
 }

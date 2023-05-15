@@ -18,10 +18,14 @@ export default async function (searchQuery, context) {
       await page.waitForTimeout(1000);
       await page.waitForSelector('a[class="_1LKTO3"]', { timeout: 10000 });
 
-      let productContainer = await page.$$('[class="_4ddWXP"]');
+      let productContainer = await page.$$('[class="_1xHGtK"]');
 
       if (productContainer.length === 0) {
         productContainer = await page.$$('[class="_2kHMtA"]');
+      }
+
+      if (productContainer.length === 0) {
+        productContainer = await page.$$('[class="_1xHGtK _373qXS"]');
       }
 
       for (let product of productContainer) {
@@ -30,12 +34,16 @@ export default async function (searchQuery, context) {
 
         const productUrl =
           $('a[class="s1Q9rs"]')?.get(0)?.attribs?.href ||
-          $('a[class="_1fQZEK"]')?.get(0)?.attribs?.href;
+          $('a[class="_1fQZEK"]')?.get(0)?.attribs?.href ||
+          $('a[class="_2UzuFa"]')?.get(0)?.attribs?.href;
 
         const [zero, first, second, third] = productUrl.split('/');
 
-        const productTitle = $('[class="_4rR01T"]')?.text() || $('[class="s1Q9rs"]')?.text();
-        const productRatingCount = parseFloat($('[class="_3LWZlK"]')?.text());
+        const productTitle =
+          $('[class="_4rR01T"]')?.text() ||
+          $('[class="s1Q9rs"]')?.text() ||
+          $('[class="IRpwTa _2-ICcC"]')?.text();
+        const productRatingCount = parseFloat($('[class="_3LWZlK"]')?.text()) || 0;
         const productReviewCount =
           +$('[class="_2_R_DZ"]')?.text()?.split('&')[1]?.split(' ')[0]?.replace(/[^\d]/g, '') || 0;
         const productPrice =
